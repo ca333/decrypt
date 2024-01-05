@@ -6,16 +6,18 @@ use std::env;
 /// * `text` - The encrypted text to decrypt.
 /// * `shift` - The shift used in the Caesar cipher.
 /// 
-fn decrypt_caesar_cipher(text: &str, shift: u8) -> String {
+fn decrypt_caesar_cipher(text: &str, shift: i32) -> String {
     text.chars()
         .map(|c| {
             if c.is_ascii_alphabetic() {
                 // Determine base character for case sensitivity
                 let first_char = if c.is_ascii_lowercase() { b'a' } else { b'A' };
                 // Calculate and apply the shift
-                let offset = c as u8 - first_char;
-                let shifted = (offset + 26 - shift) % 26;
-                (first_char + shifted) as char
+                let offset = c as i32 - first_char as i32;
+                // Adjust shift for negative values
+                let adjusted_shift = (shift % 26 + 26) % 26;
+                let shifted = (offset - adjusted_shift + 26) % 26;
+                (first_char as i32 + shifted) as u8 as char
             } else {
                 // Non-alphabetic characters are left unchanged
                 c
@@ -34,7 +36,21 @@ fn main() {
     }
 
     let encrypted_text = &args[1];
-    let shift: u8 = args[2].parse().expect("Shift must be a number");
+
+    // Handle invalid shift values and negative shifts
+    let shift = match args[2].parse::<i32>() {
+        Ok(n) => n,
+        Err(_) => {
+            eprintln!("Error: Shift must be a number");
+            std::process::exit(1);
+        },
+    };
+
+    // Check for empty input
+    if encrypted_text.is_empty() {
+        eprintln!("Error: Encrypted text cannot be empty");
+        std::process::exit(1);
+    }
 
     let decrypted_text = decrypt_caesar_cipher(encrypted_text, shift);
     println!("Decrypted Text: {}", decrypted_text);
