@@ -2,6 +2,7 @@
 name = "decrypt"
 version = "0.1.0"
 authors = ["Kadan Stadelmann <ca333@komodoplatform.com>"]
+description = "Tool for efficient and secure decryption"
 homepage = "https://decrypt.rs"
 repository = "https://github.com/ca333/decrypt"
 license = "MIT"
